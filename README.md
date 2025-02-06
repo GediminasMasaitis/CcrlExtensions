@@ -1,11 +1,11 @@
-# TLCV extensions
+# CCRL extensions
 
 The extensions consist of 2 parts:
 
-- A .js script that modifies TLCV files to query one or more kibitzers and showing/printing their evaluations.
+- A .js script that modifies CCRL live viewer files to query one or more kibitzers and showing/printing their evaluations.
 - A .NET backend capable of running those kibitzers locally in the background.
 
-Only one TLCV tab can be open at a time in the browser for these extensions to work.
+Only one CCRL live viewer tab can be open at a time in the browser for these extensions to work.
 
 This is what it looks like to watch a game with two engines (StockFish 13 and StockFish 16.1) as kibitzers:
 
