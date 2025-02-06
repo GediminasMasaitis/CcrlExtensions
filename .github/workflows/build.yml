@@ -50,12 +50,12 @@ jobs:
       run: dotnet build -c Release src/back
 
     - name: Publish Engine
-      run: dotnet publish src/back/TlcvExtensionsHost/TlcvExtensionsHost.csproj -c Release --runtime ${{ matrix.runtime-identifier }} --self-contained /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeNativeLibrariesForSelfExtract /p:IncludeAllContentForSelfExtract=true -o artifacts/${{ matrix.runtime-identifier }}
+      run: dotnet publish src/back/CcrlExtensionsHost/CcrlExtensionsHost.csproj -c Release --runtime ${{ matrix.runtime-identifier }} --self-contained /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeNativeLibrariesForSelfExtract /p:IncludeAllContentForSelfExtract=true -o artifacts/${{ matrix.runtime-identifier }}
 
-    - name: Upload TlcvExtensionsHost-${{ env.GITHUB_REF_SLUG }}-${{ github.run_number }}-${{ matrix.runtime-identifier }} artifact
+    - name: Upload CcrlExtensionsHost-${{ env.GITHUB_REF_SLUG }}-${{ github.run_number }}-${{ matrix.runtime-identifier }} artifact
       uses: actions/upload-artifact@v4
       with:
-        name: TlcvExtensionsHost-${{ env.GITHUB_REF_SLUG }}-${{ github.run_number }}-${{ matrix.runtime-identifier }}
+        name: CcrlExtensionsHost-${{ env.GITHUB_REF_SLUG }}-${{ github.run_number }}-${{ matrix.runtime-identifier }}
         path: |
           artifacts/${{ matrix.runtime-identifier }}/
           !artifacts/**/*.pdb

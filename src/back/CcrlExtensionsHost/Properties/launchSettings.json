@@ -1,7 +1,7 @@
 ﻿{
 
   "profiles": {
-    "TlcvExtensionsHost": {
+    "CcrlExtensionsHost": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,

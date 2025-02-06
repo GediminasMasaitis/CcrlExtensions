@@ -9,20 +9,20 @@ Only one CCRL live viewer tab can be open at a time in the browser for these ext
 
 This is what it looks like to watch a game with two engines (StockFish 13 and StockFish 16.1) as kibitzers:
 
-![Screenshot of the extension in action, with StockFish 13 and StockFish 16.1 acting as kibitzers in a game](https://github.com/GediminasMasaitis/TlcvExtensions/assets/11148519/0693ee16-3240-493f-98cd-8d9daa814749)
+![Screenshot of the extension in action, with StockFish 13 and StockFish 16.1 acting as kibitzers in a game](https://github.com/GediminasMasaitis/CcrlExtensions/assets/11148519/0693ee16-3240-493f-98cd-8d9daa814749)
 
 ## How to setup
 
-You can find the frontend script and a few pre-compiled binaries (Windows, Linux, macOS) in the [latest release](https://github.com/GediminasMasaitis/TlcvExtensions/releases/latest).
+You can find the frontend script and a few pre-compiled binaries (Windows, Linux, macOS) in the [latest release](https://github.com/GediminasMasaitis/CcrlExtensions/releases/latest).
 
-Alternatively, you can always build the backend yourself (.NET 8.0 required) and take the script from the repository ([`src/front/tlcvExtensions.js`](src/front/tlcvExtensions.js))
+Alternatively, you can always build the backend yourself (.NET 8.0 required) and take the script from the repository ([`src/front/ccrlExtensions.js`](src/front/ccrlExtensions.js))
 
 ### Front end
 
 1. Install a usercript runner. Only tested on Firefox and Violentmonkey plugin.
-2. Copy [`tlcvExtensions.js`](src/front/tlcvExtensions.js) into a new userscript and save changes.
+2. Copy [`ccrlExtensions.js`](src/front/ccrlExtensions.js) into a new userscript and save changes.
 
-![Screenshot of Violentmonkey setup](https://github.com/GediminasMasaitis/TlcvExtensions/assets/11148519/13439011-eb74-4004-8ba9-1b5399e248b5)
+![Screenshot of Violentmonkey setup](https://github.com/GediminasMasaitis/CcrlExtensions/assets/11148519/13439011-eb74-4004-8ba9-1b5399e248b5)
 
 ### Back end
 

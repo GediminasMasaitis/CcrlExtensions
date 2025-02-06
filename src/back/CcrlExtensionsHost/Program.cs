@@ -1,7 +1,7 @@
-using TlcvExtensionsHost.Services;
-using TlcvExtensionsHost.Models;
+using CcrlExtensionsHost.Services;
+using CcrlExtensionsHost.Models;
 using Microsoft.AspNetCore.Mvc;
-using TlcvExtensionsHost;
+using CcrlExtensionsHost;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +10,7 @@ builder.WebHost.UseUrls("http://127.0.0.1:5210");
 #pragma warning restore S1075 // URIs should not be hardcoded
 
 builder.Logging.ConfigureSerilog(builder.Configuration);
-builder.Services.AddTlcvExtensions(builder.Configuration);
+builder.Services.AddCcrlExtensions(builder.Configuration);
 
 var app = builder.Build();
 

@@ -1,4 +1,4 @@
-﻿namespace TlcvExtensionsHost.Models;
+﻿namespace CcrlExtensionsHost.Models;
 
 public class QueryResponse
 {

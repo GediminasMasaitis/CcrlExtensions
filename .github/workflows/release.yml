@@ -60,12 +60,12 @@ jobs:
       run: dotnet build -c Release src/back
 
     - name: Publish Engine
-      run: dotnet publish src/back/TlcvExtensionsHost/TlcvExtensionsHost.csproj -c Release --runtime ${{ matrix.runtime-identifier }} --self-contained /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeNativeLibrariesForSelfExtract /p:IncludeAllContentForSelfExtract=true -o artifacts/${{ matrix.runtime-identifier }}
+      run: dotnet publish src/back/CcrlExtensionsHost/CcrlExtensionsHost.csproj -c Release --runtime ${{ matrix.runtime-identifier }} --self-contained /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeNativeLibrariesForSelfExtract /p:IncludeAllContentForSelfExtract=true -o artifacts/${{ matrix.runtime-identifier }}
 
-    - name: Upload TlcvExtensionsHost-${{ github.event.inputs.version }}-${{ matrix.runtime-identifier }} artifact
+    - name: Upload CcrlExtensionsHost-${{ github.event.inputs.version }}-${{ matrix.runtime-identifier }} artifact
       uses: actions/upload-artifact@v4
       with:
-        name: TlcvExtensionsHost-${{ github.event.inputs.version }}-${{ matrix.runtime-identifier }}
+        name: CcrlExtensionsHost-${{ github.event.inputs.version }}-${{ matrix.runtime-identifier }}
         path: |
           artifacts/${{ matrix.runtime-identifier }}/
           !artifacts/**/*.pdb
@@ -125,6 +125,6 @@ jobs:
         for asset in artifacts/*.zip; do
           assets+=("-a" "$asset")
         done
-        assets+=("-a" "src/front/tlcvExtensions.js")
+        assets+=("-a" "src/front/ccrlExtensions.js")
         tag_name="v${{ github.event.inputs.version }}"
         hub release create "${assets[@]}" --draft --message "$tag_name" "$tag_name"
