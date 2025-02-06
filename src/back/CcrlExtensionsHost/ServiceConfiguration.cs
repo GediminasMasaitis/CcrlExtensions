@@ -1,19 +1,19 @@
-﻿using TlcvExtensionsHost.Configs;
-using TlcvExtensionsHost.Services;
+﻿using CcrlExtensionsHost.Configs;
+using CcrlExtensionsHost.Services;
 using Serilog;
 using Serilog.Events;
 using Serilog.Core;
 
-namespace TlcvExtensionsHost;
+namespace CcrlExtensionsHost;
 
 public static class ServiceConfiguration
 {
-    public static IServiceCollection AddTlcvExtensions(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCcrlExtensions(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<ServiceConfig>(configuration);
 
         services.ConfigureHttpJsonOptions(options =>
-            options.SerializerOptions.TypeInfoResolverChain.Add(TlcvExtensionsHostJsonSerializerContext.Default));
+            options.SerializerOptions.TypeInfoResolverChain.Add(CcrlExtensionsHostJsonSerializerContext.Default));
 
         services.AddSingleton<EngineManager>();
         services.AddTransient<Engine>();

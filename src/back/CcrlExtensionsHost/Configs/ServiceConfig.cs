@@ -1,4 +1,4 @@
-﻿namespace TlcvExtensionsHost.Configs;
+﻿namespace CcrlExtensionsHost.Configs;
 
 public class ServiceConfig
 {

@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name        TLCV Extensions
+// @name        CCRL Extensions
 // @namespace   Violentmonkey Scripts
 // @match       https://ccrl.live/*
 // @grant       GM.xmlHttpRequest
 // @version     1.0
 // @author      Gediminas Masaitis
-// @description Kibitzer and eval graph support for TLCV
+// @description Kibitzer and eval graph support for CCRL
 // @require     https://code.jquery.com/jquery-3.7.0.min.js
 // @require     https://cdn.jsdelivr.net/npm/chart.js
 // ==/UserScript==

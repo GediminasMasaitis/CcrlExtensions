@@ -1,6 +1,6 @@
-﻿using TlcvExtensionsHost.Configs;
+﻿using CcrlExtensionsHost.Configs;
 
-namespace TlcvExtensionsHost.Models;
+namespace CcrlExtensionsHost.Models;
 
 public class FenResponse
 {

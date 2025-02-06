@@ -1,6 +1,6 @@
-﻿using TlcvExtensionsHost.Services;
+﻿using CcrlExtensionsHost.Services;
 
-namespace TlcvExtensionsHost;
+namespace CcrlExtensionsHost;
 
 internal class EnginesHostedService : IHostedService
 {

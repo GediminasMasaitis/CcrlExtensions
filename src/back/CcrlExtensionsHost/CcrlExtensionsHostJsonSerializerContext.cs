@@ -1,10 +1,10 @@
 ﻿using System.Text.Json.Serialization;
-using TlcvExtensionsHost.Models;
+using CcrlExtensionsHost.Models;
 
-namespace TlcvExtensionsHost;
+namespace CcrlExtensionsHost;
 
 [JsonSerializable(typeof(QueryResponse))]
 [JsonSerializable(typeof(EngineInfo))]
 [JsonSerializable(typeof(FenRequest))]
 [JsonSerializable(typeof(FenResponse))]
-internal partial class TlcvExtensionsHostJsonSerializerContext : JsonSerializerContext;
+internal partial class CcrlExtensionsHostJsonSerializerContext : JsonSerializerContext;

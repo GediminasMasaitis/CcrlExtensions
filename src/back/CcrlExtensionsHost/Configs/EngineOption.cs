@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TlcvExtensionsHost.Configs;
+namespace CcrlExtensionsHost.Configs;
 
 public sealed record EngineOption
 {
