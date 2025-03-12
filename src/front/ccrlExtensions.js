@@ -231,14 +231,15 @@
     scores[1][plyStr] = blackScore
 
     var chartData = [];
-    for(var i = 0; i < scores.length; i++){
-      chartData.push([]);
-      for (var key in scores[i]) {
-        if (scores[i].hasOwnProperty(key)) {
-          chartData[i].push(scores[i][key]);
-        }
-      }
-      chart.data.datasets[i].data = chartData[i];
+    for (var i = 0; i < scores.length; i++){
+       chartData.push([]);
+       // iterate over the labels array to ensure alignment with the x-axis
+       for (var j = 0; j < labels.length; j++){
+          var plyKey = labels[j];
+          // If the score exists for that ply, use it; otherwise, use null (or 0)
+          chartData[i].push(scores[i][plyKey] !== undefined ? scores[i][plyKey] : null);
+       }
+       chart.data.datasets[i].data = chartData[i];
     }
     chart.update();
   }, 1000);
