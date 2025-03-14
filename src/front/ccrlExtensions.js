@@ -31,6 +31,11 @@
     return parts.length === 6 ? parseInt(parts[5]) : 1;
   };
 
+  const isWhiteToMove = (fen) => {
+    const parts = fen.split(" ");
+    return parts[1] == "w" ? true : false
+  };
+
   const convertPVToAlgebraic = (pv, startingFen) => {
     if (typeof Chess === 'undefined') {
       console.error("Chess.js not loaded");
@@ -58,7 +63,7 @@
         } else {
           groups.push({
             moveNumber: currentMoveNumber,
-            white: "...",
+            white: "...",  // <-- Place "..." after move number when Black moves first
             black: moveObj.san
           });
         }
@@ -318,7 +323,7 @@
 
           let multipvHtml = "";
           if (info.multipv) {
-            info.multipv.sort((a, b) => a.multipv - b.multipv).forEach((variation) => {
+            info.multipv.sort((a, b) => isWhiteToMove ? (-a.score + b.score) : (a.score - b.score)).forEach((variation) => {
               const scoreNum = (parseInt(variation.score) / 100).toFixed(2);
               const algebraicPV = convertPVToAlgebraic(variation.pv, currentFen);
               multipvHtml += `
