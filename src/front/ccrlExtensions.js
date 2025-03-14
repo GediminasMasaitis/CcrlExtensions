@@ -75,67 +75,139 @@
     }).join(" ");
   };
 
-  // DOM Manipulation and layout setup
+  // Create page layout
   const container = $('.container').css('max-width', '180vh');
-  const layout = $('.main-layout').css({
-    "grid-template-columns": "40% 30% 30%"
+
+  // Create a wrapper for the whole page content
+  const pageWrapper = $('<div id="page-wrapper"></div>').css({
+    'display': 'flex',
+    'flex-direction': 'row',
+    'width': '100%',
+    'gap': '15px'
   });
 
-  for (let kibitzerIndex = 0; kibitzerIndex < 2; kibitzerIndex++) {
-    const kibitzerNum = kibitzerIndex + 1;
-    const kibitzerInfo = $(`<div id="kibitzer${kibitzerNum}-info"></div>`);
-    layout.append(kibitzerInfo);
-    kibitzerInfo.css({
-      'grid-row-start': kibitzerIndex % 2 === 0 ? '1' : '4',
-      'grid-column-start': '3'
-    })
-      .append(`<h3 id="kibitzer${kibitzerNum}-name">Kibitzer ${kibitzerNum} inactive</h3>`)
-      .append(`
-        <div class="card fluid">
-          <div class="row">
-            <div class="col-sm">
-              <div class="row">
-                <div class="col-sm info">
-                  <p class="small-margin"><small class="info-header">Score</small></p>
-                  <p class="small-margin info-value" id="kibitzer${kibitzerNum}-score">0</p>
-                </div>
-                <div class="col-sm info">
-                  <p class="small-margin"><small class="info-header">Depth</small></p>
-                  <p class="small-margin info-value" id="kibitzer${kibitzerNum}-depth">0</p>
-                </div>
-                <div class="col-sm info">
-                  <p class="small-margin"><small class="info-header">Nodes</small></p>
-                  <p class="small-margin info-value" id="kibitzer${kibitzerNum}-nodes">0</p>
-                </div>
-                <div class="col-sm info">
-                  <p class="small-margin"><small class="info-header">Nps</small></p>
-                  <p class="small-margin info-value" id="kibitzer${kibitzerNum}-nps">0</p>
-                </div>
+  // Move all existing content from the container to a main content div
+  const mainContent = $('<div id="main-content"></div>').css({
+    'flex': '7',
+    'min-width': '0'
+  });
+
+  // Create the sidebar for analysis
+  const sidebarAnalysis = $('<div id="sidebar-analysis"></div>').css({
+    'flex': '3',
+    'display': 'flex',
+    'flex-direction': 'column',
+    'gap': '15px',
+    'min-width': '300px',
+    'max-width': '400px'
+  });
+
+  // Move existing container children to mainContent
+  container.children().appendTo(mainContent);
+
+  // Clear container and add our new structure
+  container.empty().append(pageWrapper);
+  pageWrapper.append(mainContent).append(sidebarAnalysis);
+
+  // Create the first kibitzer
+  const kibitzerInfo1 = $(`<div id="kibitzer1-info"></div>`).css({
+    'margin-bottom': '15px',
+    'overflow': 'auto',
+    'max-height': '30vh'
+  });
+
+  sidebarAnalysis.append(kibitzerInfo1);
+
+  kibitzerInfo1
+    .append(`<h3 id="kibitzer1-name">Kibitzer 1 inactive</h3>`)
+    .append(`
+      <div class="card fluid">
+        <div class="row">
+          <div class="col-sm">
+            <div class="row">
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Score</small></p>
+                <p class="small-margin info-value" id="kibitzer1-score">0</p>
+              </div>
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Depth</small></p>
+                <p class="small-margin info-value" id="kibitzer1-depth">0</p>
+              </div>
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Nodes</small></p>
+                <p class="small-margin info-value" id="kibitzer1-nodes">0</p>
+              </div>
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Nps</small></p>
+                <p class="small-margin info-value" id="kibitzer1-nps">0</p>
               </div>
             </div>
-            <div class="col-sm-3" style="text-align: right">
-              <h3><small id="kibitzer${kibitzerNum}-time"><mark>&#8734;</mark></small></h3>
-            </div>
-            <div class="col-sm-12">
-              <p class="pv"><small id="kibitzer${kibitzerNum}-pv"></small></p>
-            </div>
+          </div>
+          <div class="col-sm-3" style="text-align: right">
+            <h3><small id="kibitzer1-time"><mark>&#8734;</mark></small></h3>
+          </div>
+          <div class="col-sm-12">
+            <p class="pv"><small id="kibitzer1-pv"></small></p>
           </div>
         </div>
-      `)
-      .append(`<p class="pv"><small id="kibitzer${kibitzerNum}-pv"></small></p>`)
-      .append(`<p class="mainline" id="kibitzer${kibitzerNum}-mainline" style="margin-top: 5px; font-style: italic;"></p>`);
-  }
+      </div>
+    `)
+    .append(`<p class="mainline" id="kibitzer1-mainline" style="margin-top: 5px; font-style: italic;"></p>`);
 
   // Setup chart container
-  const evalChartContainer = $('<div id="eval-chart-container"><canvas id="eval-chart"></canvas></div>');
-  layout.append(evalChartContainer);
-  evalChartContainer.css({
-    'grid-row-start': '2',
-    'grid-row-end': '4',
-    'grid-column-start': '3',
-    'position': 'relative',
-    'z-index': '10'
+  const evalChartContainer = $('<div id="eval-chart-container"><canvas id="eval-chart"></canvas></div>').css({
+    'width': '100%',
+    'height': '300px',
+    'margin-bottom': '15px'
   });
+
+  // Append the chart container to the sidebar
+  sidebarAnalysis.append(evalChartContainer);
+
+  // Create the second kibitzer (placed after the chart)
+  const kibitzerInfo2 = $(`<div id="kibitzer2-info"></div>`).css({
+    'margin-bottom': '15px',
+    'overflow': 'auto',
+    'max-height': '30vh'
+  });
+
+  sidebarAnalysis.append(kibitzerInfo2);
+
+  kibitzerInfo2
+    .append(`<h3 id="kibitzer2-name">Kibitzer 2 inactive</h3>`)
+    .append(`
+      <div class="card fluid">
+        <div class="row">
+          <div class="col-sm">
+            <div class="row">
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Score</small></p>
+                <p class="small-margin info-value" id="kibitzer2-score">0</p>
+              </div>
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Depth</small></p>
+                <p class="small-margin info-value" id="kibitzer2-depth">0</p>
+              </div>
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Nodes</small></p>
+                <p class="small-margin info-value" id="kibitzer2-nodes">0</p>
+              </div>
+              <div class="col-sm info">
+                <p class="small-margin"><small class="info-header">Nps</small></p>
+                <p class="small-margin info-value" id="kibitzer2-nps">0</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3" style="text-align: right">
+            <h3><small id="kibitzer2-time"><mark>&#8734;</mark></small></h3>
+          </div>
+          <div class="col-sm-12">
+            <p class="pv"><small id="kibitzer2-pv"></small></p>
+          </div>
+        </div>
+      </div>
+    `)
+    .append(`<p class="mainline" id="kibitzer2-mainline" style="margin-top: 5px; font-style: italic;"></p>`);
 
   const ctx = $("#eval-chart")[0];
   const chart = new Chart(ctx, {
@@ -165,6 +237,8 @@
       ]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true
@@ -211,8 +285,13 @@
     const fen = getFen();
     if (!fen) return;
 
-    const ply = (parseInt(fen.split(" ")[5]) * 2) + (fen.includes(" b ") ? 1 : 0);
+    // Correct ply calculation
+    const fenParts = fen.split(" ");
+    const fullmoveNumber = parseInt(fenParts[5]) || 1;
+    const activeColor = fenParts[1];
+    const ply = (fullmoveNumber - 1) * 2 + (activeColor === 'b' ? 1 : 0);
     const plyStr = ply.toString();
+
     if (!labels.includes(plyStr)) {
       labels.push(plyStr);
       chart.data.labels = labels;
@@ -226,10 +305,14 @@
         engineInfos.forEach((info, index) => {
           const kibitzerNum = index + 1;
           const score = info.score / 100;
-          $(`#kibitzer${kibitzerNum}-score`).text(score);
+          $(`#kibitzer${kibitzerNum}-score`).text(score.toFixed(2));
           $(`#kibitzer${kibitzerNum}-depth`).text(info.depth);
           $(`#kibitzer${kibitzerNum}-nodes`).text(formatCompactNumber(info.nodes));
           $(`#kibitzer${kibitzerNum}-nps`).text(formatCompactNumber(info.nps));
+
+          // Update kibitzer scores for the chart (positions 2 and 3 in the scores array)
+          const datasetIndex = 2 + index;
+          scores[datasetIndex][plyStr] = score;
 
           let multipvHtml = "";
           if (info.multipv) {
@@ -251,12 +334,22 @@
       onerror: () => console.log("Failed querying backend")
     });
 
-    scores[0][plyStr] = parseFloat($("#white-score").text());
-    scores[1][plyStr] = parseFloat($("#black-score").text());
+    // Handle White and Black scores with validation
+    const whiteScoreText = $("#white-score").text();
+    const blackScoreText = $("#black-score").text();
+    const whiteScore = parseFloat(whiteScoreText);
+    const blackScore = parseFloat(blackScoreText);
 
-    // Update chart
+    if (!isNaN(whiteScore)) {
+      scores[0][plyStr] = whiteScore;
+    }
+    if (!isNaN(blackScore)) {
+      scores[1][plyStr] = blackScore;
+    }
+
+    // Update chart datasets
     chart.data.datasets.forEach((dataset, i) => {
-      dataset.data = labels.map((plyStr) => scores[i][plyStr] || null);
+      dataset.data = labels.map(plyStr => scores[i][plyStr] ?? null);
     });
     chart.update();
   }, 1000);
