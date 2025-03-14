@@ -323,7 +323,7 @@
 
           let multipvHtml = "";
           if (info.multipv) {
-            info.multipv.sort((a, b) => isWhiteToMove ? (-a.score + b.score) : (a.score - b.score)).forEach((variation) => {
+            info.multipv.sort((a, b) => isWhiteToMove(currentFen) ? -a.score + b.score : a.score - b.score).forEach((variation) => {
               const scoreNum = (parseInt(variation.score) / 100).toFixed(2);
               const algebraicPV = convertPVToAlgebraic(variation.pv, currentFen);
               multipvHtml += `
