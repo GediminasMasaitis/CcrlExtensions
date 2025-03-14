@@ -77,12 +77,12 @@ public partial class Engine
     {
         _logger.LogDebug("{EngineName} >> {EngineOutput}", Config?.Name, line);
 
-        var success = TryGetEngineInfo(line, out var info);
-        if (success)
-        {
-            CurrentEngineInfo = info;
-        }
+        var success = TryUpdateEngineInfo(line);
     }
+
+    [GeneratedRegex(" multipv (\\d+)", RegexOptions.Compiled)]
+    private static partial Regex MultipvRegex();
+    private readonly Regex _multipvRegex = MultipvRegex();
 
     [GeneratedRegex(" score cp (-?\\d+)", RegexOptions.Compiled)]
     private static partial Regex CpRegex();
@@ -104,88 +104,107 @@ public partial class Engine
     private static partial Regex PvRegex();
     private readonly Regex _pvRegex = PvRegex();
 
-    private bool TryGetEngineInfo(string? line, out EngineInfo info)
+    private bool TryUpdateEngineInfo(string? line)
     {
-        info = new EngineInfo();
         if (string.IsNullOrEmpty(line))
-        {
             return false;
-        }
 
+        // Only process lines containing "info" and "uciok"
         if (!line.Contains("info"))
         {
             if (line.Contains("uciok"))
             {
-                info.Name = Config?.Name;
-
+                if (CurrentEngineInfo == null)
+                    CurrentEngineInfo = new EngineInfo();
+                CurrentEngineInfo.Name = Config?.Name;
                 return true;
             }
-
             return false;
         }
 
-        if (line.Contains("lowerbound"))
+        if (line.Contains("lowerbound") || line.Contains("upperbound") || line.Contains("currmove"))
+            return false;
+
+        if (CurrentEngineInfo == null)
+            CurrentEngineInfo = new EngineInfo();
+
+        // Default multipv number is 1
+        int multipvNumber = 1;
+        var multipvMatch = _multipvRegex.Match(line);
+        if (multipvMatch.Success)
         {
-            return false;
+            int.TryParse(multipvMatch.Groups[1].Value, out multipvNumber);
         }
 
-        if (line.Contains("upperbound"))
-        {
-            return false;
-        }
-
-        if (line.Contains("currmove"))
-        {
-            return false;
-        }
-
-        info.Name = Config?.Name;
-
+        // Parse the score (cp), depth, nodes, nps, and pv as before.
+        int cp = 0;
         var cpMatch = _cpRegex.Match(line);
-        if (cpMatch.Success)
+        if (cpMatch.Success && int.TryParse(cpMatch.Groups[1].Value, out var cpParsed))
         {
-            if (int.TryParse(cpMatch.Groups[1].Value, out var cp))
-            {
-                if (_currentFen?.Contains(" b ") == true)
-                {
-                    cp = -cp;
-                }
-                info.Score = cp.ToString();
-            }
+            cp = cpParsed;
+            if (_currentFen?.Contains(" b ") == true)
+                cp = -cp;
         }
 
+        int depth = 0;
         var depthMatch = _depthRegex.Match(line);
-        if (depthMatch.Success)
+        if (depthMatch.Success && int.TryParse(depthMatch.Groups[1].Value, out var depthParsed))
         {
-            if (int.TryParse(depthMatch.Groups[1].Value, out var depth))
-            {
-                info.Depth = depth;
-            }
+            depth = depthParsed;
         }
 
+        long nodes = 0;
         var nodesMatch = _nodesRegex.Match(line);
-        if (nodesMatch.Success)
+        if (nodesMatch.Success && long.TryParse(nodesMatch.Groups[1].Value, out var nodesParsed))
         {
-            if (long.TryParse(nodesMatch.Groups[1].Value, out var nodes))
-            {
-                info.Nodes = nodes;
-            }
+            nodes = nodesParsed;
         }
 
+        long nps = 0;
         var npsMatch = _npsRegex.Match(line);
-        if (npsMatch.Success)
+        if (npsMatch.Success && long.TryParse(npsMatch.Groups[1].Value, out var npsParsed))
         {
-            if (long.TryParse(npsMatch.Groups[1].Value, out var nps))
-            {
-                info.Nps = nps;
-            }
+            nps = npsParsed;
         }
 
+        string pv = "";
         var pvMatch = _pvRegex.Match(line);
         if (pvMatch.Success)
         {
-            info.Pv = pvMatch.Groups[1].Value;
+            pv = pvMatch.Groups[1].Value;
         }
+
+        // Update or add the multipv variation.
+        var existing = CurrentEngineInfo.Multipv.FirstOrDefault(m => m.Multipv == multipvNumber);
+        if (existing != null)
+        {
+            existing.Depth = depth;
+            existing.Score = cp.ToString();
+            existing.Pv = pv;
+        }
+        else
+        {
+            // Add new variation if not present.
+            CurrentEngineInfo.Multipv.Add(new MultipvInfo
+            {
+                Multipv = multipvNumber,
+                Depth = depth,
+                Score = cp.ToString(),
+                Pv = pv
+            });
+        }
+
+        // Also update the default (multipv 1) fields for convenience since they are used by main visualizer.
+        if (multipvNumber == 1)
+        {
+            CurrentEngineInfo.Score = cp.ToString();
+            CurrentEngineInfo.Depth = depth;
+            CurrentEngineInfo.Pv = pv;
+        }
+        // Always update nps and nodes.
+        CurrentEngineInfo.Nps = nps;
+        CurrentEngineInfo.Nodes = nodes;
+        CurrentEngineInfo.Name = Config?.Name;
 
         return true;
     }
