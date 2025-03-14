@@ -40,14 +40,13 @@
     const moves = pv.trim().split(/\s+/);
     let groups = [];
     let currentMoveNumber = getFullmoveNumberFromFen(startingFen);
+    let isWhiteToMove = chess.turn() === 'w';
 
     moves.forEach((move, i) => {
-      let moveObj = chess.move(move, {
-        sloppy: true
-      });
+      let moveObj = chess.move(move, { sloppy: true });
       if (!moveObj) return;
 
-      if (chess.turn() === 'w') {
+      if (isWhiteToMove) {
         groups.push({
           moveNumber: currentMoveNumber,
           white: moveObj.san,
@@ -59,19 +58,22 @@
         } else {
           groups.push({
             moveNumber: currentMoveNumber,
-            white: null,
+            white: "...",
             black: moveObj.san
           });
         }
         currentMoveNumber++;
       }
+
+      isWhiteToMove = chess.turn() === 'w';
     });
 
     return groups.map(group => {
       let moveNumberHtml = `<span style="color: #f5c276; font-weight: bold;">${group.moveNumber}.</span>`;
-      let output = `${moveNumberHtml} <span style="color: #ffffff;">${group.white || '...'}</span>`;
-      if (group.black) output += ` <span style="color: #ffffff;">${group.black}</span>`;
-      return output;
+      let whiteMove = group.white ? `<span style="color: #ffffff;">${group.white}</span>` : '';
+      let blackMove = group.black ? `<span style="color: #ffffff;">${group.black}</span>` : '';
+
+      return `${moveNumberHtml} ${whiteMove} ${blackMove}`.trim();
     }).join(" ");
   };
 
