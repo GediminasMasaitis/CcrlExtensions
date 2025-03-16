@@ -36,51 +36,51 @@
     return parts[1] == "w" ? true : false
   };
 
-  const convertPVToAlgebraic = (pv, startingFen) => {
-    if (typeof Chess === 'undefined') {
-      console.error("Chess.js not loaded");
-      return pv;
-    }
-    const chess = new Chess(startingFen);
-    const moves = pv.trim().split(/\s+/);
-    let groups = [];
-    let currentMoveNumber = getFullmoveNumberFromFen(startingFen);
-    let isWhiteToMove = chess.turn() === 'w';
+const convertPVToAlgebraic = (pv, startingFen) => {
+  if (typeof Chess === 'undefined') {
+    console.error("Chess.js not loaded");
+    return pv;
+  }
+  const chess = new Chess(startingFen);
+  const moves = pv.trim().split(/\s+/);
+  let groups = [];
+  let currentMoveNumber = getFullmoveNumberFromFen(startingFen);
+  let isWhiteToMove = chess.turn() === 'w';
 
-    moves.forEach((move, i) => {
-      let moveObj = chess.move(move, { sloppy: true });
-      if (!moveObj) return;
+  moves.forEach((move, i) => {
+    let moveObj = chess.move(move, { sloppy: true });
+    if (!moveObj) return;
 
-      if (isWhiteToMove) {
+    if (isWhiteToMove) {
+      groups.push({
+        moveNumber: currentMoveNumber,
+        white: moveObj.san,
+        black: null
+      });
+    } else {
+      if (groups.length > 0) {
+        groups[groups.length - 1].black = moveObj.san;
+      } else {
         groups.push({
           moveNumber: currentMoveNumber,
-          white: moveObj.san,
-          black: null
+          white: "...",  // <-- Place "..." after move number when Black moves first
+          black: moveObj.san
         });
-      } else {
-        if (groups.length > 0) {
-          groups[groups.length - 1].black = moveObj.san;
-        } else {
-          groups.push({
-            moveNumber: currentMoveNumber,
-            white: "...",  // <-- Place "..." after move number when Black moves first
-            black: moveObj.san
-          });
-        }
-        currentMoveNumber++;
       }
+      currentMoveNumber++;
+    }
 
-      isWhiteToMove = chess.turn() === 'w';
-    });
+    isWhiteToMove = chess.turn() === 'w';
+  });
 
-    return groups.map(group => {
-      let moveNumberHtml = `<span style="color: #f5c276; font-weight: bold;">${group.moveNumber}.</span>`;
-      let whiteMove = group.white ? `<span style="color: #ffffff;">${group.white}</span>` : '';
-      let blackMove = group.black ? `<span style="color: #ffffff;">${group.black}</span>` : '';
+  return groups.map(group => {
+    let moveNumberHtml = `<span style="color: #f5c276; font-weight: bold;">${group.moveNumber}.</span>`;
+    let whiteMove = group.white ? `<span style="color: #ffffff;">${group.white}</span>` : '';
+    let blackMove = group.black ? `<span style="color: #ffffff;">${group.black}</span>` : '';
 
-      return `${moveNumberHtml} ${whiteMove} ${blackMove}`.trim();
-    }).join(" ");
-  };
+    return `${moveNumberHtml} ${whiteMove} ${blackMove}`.trim();
+  }).join(" ");
+};
 
   // Create page layout
   const container = $('.container').css('max-width', '180vh');
@@ -105,8 +105,8 @@
     'display': 'flex',
     'flex-direction': 'column',
     'gap': '15px',
-    'min-width': '300px',
-    'max-width': '400px'
+    'min-width': '0',
+    'max-width': 'none'
   });
 
   // Move existing container children to mainContent
