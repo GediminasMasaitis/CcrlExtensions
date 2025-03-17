@@ -10,6 +10,13 @@ public partial class Engine
     private const int GracefulShutdownTime = 3_000;
 
     private readonly ILogger<Engine> _logger;
+
+    private static readonly string[] _stringsToIgnore =  
+    [  
+        "lowerbound",  
+        "upperbound",  
+        "currmove"  
+    ];  
     private Process? _process;
     private string? _currentFen;
 
@@ -121,17 +128,19 @@ public partial class Engine
             return false;
         }
 
-        if (line.Contains("lowerbound") || line.Contains("upperbound") || line.Contains("currmove"))
+        if (_stringsToIgnore.Any(line.Contains))
+        {
             return false;
+        }
 
         CurrentEngineInfo ??= new EngineInfo();
 
         // Default multipv number is 1
         int multipvNumber = 1;
         var multipvMatch = _multipvRegex.Match(line);
-        if (multipvMatch.Success)
+        if (multipvMatch.Success && int.TryParse(multipvMatch.Groups[1].Value, out var multiPvNumberParsed))
         {
-            int.TryParse(multipvMatch.Groups[1].Value, out multipvNumber);
+            multipvNumber = multiPvNumberParsed;
         }
 
         // Parse the score (cp), depth, nodes, nps, and pv.
