@@ -114,8 +114,7 @@ public partial class Engine
         {
             if (line.Contains("uciok"))
             {
-                if (CurrentEngineInfo == null)
-                    CurrentEngineInfo = new EngineInfo();
+                CurrentEngineInfo ??= new EngineInfo();
                 CurrentEngineInfo.Name = Config?.Name;
                 return true;
             }
@@ -125,8 +124,7 @@ public partial class Engine
         if (line.Contains("lowerbound") || line.Contains("upperbound") || line.Contains("currmove"))
             return false;
 
-        if (CurrentEngineInfo == null)
-            CurrentEngineInfo = new EngineInfo();
+        CurrentEngineInfo ??= new EngineInfo();
 
         // Default multipv number is 1
         int multipvNumber = 1;
@@ -136,14 +134,16 @@ public partial class Engine
             int.TryParse(multipvMatch.Groups[1].Value, out multipvNumber);
         }
 
-        // Parse the score (cp), depth, nodes, nps, and pv as before.
+        // Parse the score (cp), depth, nodes, nps, and pv.
         int cp = 0;
         var cpMatch = _cpRegex.Match(line);
         if (cpMatch.Success && int.TryParse(cpMatch.Groups[1].Value, out var cpParsed))
         {
             cp = cpParsed;
             if (_currentFen?.Contains(" b ") == true)
+            {
                 cp = -cp;
+            }
         }
 
         int depth = 0;
@@ -201,6 +201,7 @@ public partial class Engine
             CurrentEngineInfo.Depth = depth;
             CurrentEngineInfo.Pv = pv;
         }
+
         // Always update nps and nodes.
         CurrentEngineInfo.Nps = nps;
         CurrentEngineInfo.Nodes = nodes;

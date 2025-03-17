@@ -17,5 +17,5 @@ public class EngineInfo
     public string? Pv { get; set; }
 
     // Multipv
-    public List<MultipvInfo> Multipv { get; set; } = new List<MultipvInfo>();
+    public List<MultipvInfo> Multipv { get; set; } = [];
 }
