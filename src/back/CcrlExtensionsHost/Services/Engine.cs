@@ -11,12 +11,12 @@ public partial class Engine
 
     private readonly ILogger<Engine> _logger;
 
-    private static readonly string[] _stringsToIgnore =  
-    [  
-        "lowerbound",  
-        "upperbound",  
-        "currmove"  
-    ];  
+    private static readonly string[] _stringsToIgnore =
+    [
+        "lowerbound",
+        "upperbound",
+        "currmove"
+    ];
     private Process? _process;
     private string? _currentFen;
 
