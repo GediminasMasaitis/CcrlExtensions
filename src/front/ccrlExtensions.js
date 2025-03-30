@@ -31,56 +31,81 @@
     return parts.length === 6 ? parseInt(parts[5]) : 1;
   };
 
-  const isWhiteToMove = (fen) => {
-    const parts = fen.split(" ");
-    return parts[1] == "w" ? true : false
-  };
+  const convertPVToAlgebraic = (pv, startingFen) => {
+    if (typeof Chess === 'undefined') {
+      console.error("Chess.js not loaded");
+      return pv;
+    }
+    const chess = new Chess(startingFen);
+    const moves = pv.trim().split(/\s+/);
+    let groups = [];
+    let currentMoveNumber = getFullmoveNumberFromFen(startingFen);
+    let isWhiteToMove = chess.turn() === 'w';
 
-const convertPVToAlgebraic = (pv, startingFen) => {
-  if (typeof Chess === 'undefined') {
-    console.error("Chess.js not loaded");
-    return pv;
-  }
-  const chess = new Chess(startingFen);
-  const moves = pv.trim().split(/\s+/);
-  let groups = [];
-  let currentMoveNumber = getFullmoveNumberFromFen(startingFen);
-  let isWhiteToMove = chess.turn() === 'w';
+    moves.forEach((move, i) => {
+      let moveObj = chess.move(move, { sloppy: true });
+      if (!moveObj) return;
 
-  moves.forEach((move, i) => {
-    let moveObj = chess.move(move, { sloppy: true });
-    if (!moveObj) return;
-
-    if (isWhiteToMove) {
-      groups.push({
-        moveNumber: currentMoveNumber,
-        white: moveObj.san,
-        black: null
-      });
-    } else {
-      if (groups.length > 0) {
-        groups[groups.length - 1].black = moveObj.san;
-      } else {
+      if (isWhiteToMove) {
         groups.push({
           moveNumber: currentMoveNumber,
-          white: "...",  // <-- Place "..." after move number when Black moves first
-          black: moveObj.san
+          white: moveObj.san,
+          black: null
         });
+      } else {
+        if (groups.length > 0) {
+          groups[groups.length - 1].black = moveObj.san;
+        } else {
+          groups.push({
+            moveNumber: currentMoveNumber,
+            white: "...",  // <-- Place "..." after move number when Black moves first
+            black: moveObj.san
+          });
+        }
+        currentMoveNumber++;
       }
-      currentMoveNumber++;
+
+      isWhiteToMove = chess.turn() === 'w';
+    });
+
+    return groups.map(group => {
+      let moveNumberHtml = `<span style="color: #f5c276; font-weight: bold;">${group.moveNumber}.</span>`;
+      let whiteMove = group.white ? `<span style="color: #ffffff;">${group.white}</span>` : '';
+      let blackMove = group.black ? `<span style="color: #ffffff;">${group.black}</span>` : '';
+
+      return `${moveNumberHtml} ${whiteMove} ${blackMove}`.trim();
+    }).join(" ");
+  };
+
+  // A helper function to parse the score string into a numeric value and display string
+  const parseScore = (scoreText) => {
+    scoreText = scoreText.trim();
+    console.log(scoreText)
+    // Format: "+MX" where X is a positive integer (mate for white)
+    if (scoreText.startsWith("+M")) {
+      const mateMoves = parseInt(scoreText.substring(2));
+
+      // Use a high constant (e.g. 1000) so that mate scores are always above normal evals.
+      const value = 1000 - (isNaN(mateMoves) ? 0 : mateMoves);
+      return { value: value, tooltip: scoreText };
     }
-
-    isWhiteToMove = chess.turn() === 'w';
-  });
-
-  return groups.map(group => {
-    let moveNumberHtml = `<span style="color: #f5c276; font-weight: bold;">${group.moveNumber}.</span>`;
-    let whiteMove = group.white ? `<span style="color: #ffffff;">${group.white}</span>` : '';
-    let blackMove = group.black ? `<span style="color: #ffffff;">${group.black}</span>` : '';
-
-    return `${moveNumberHtml} ${whiteMove} ${blackMove}`.trim();
-  }).join(" ");
-};
+    // Format: "-MX" where X is a positive integer (mate for black)
+    else if (scoreText.startsWith("-M")) {
+      const mateMoves = parseInt(scoreText.substring(2));
+      // Use a low constant so that mate scores are always below normal evals.
+      const value = -1000 + (isNaN(mateMoves) ? 0 : mateMoves);
+      return { value: value, tooltip: scoreText };
+    }
+    else {
+      const numStr = scoreText;
+      const value = parseFloat(numStr);
+      if (!isNaN(value)) {
+        return { value: value, tooltip: scoreText };
+      }
+    }
+    // If none of the formats match, return null.
+    return null;
+  }
 
   // Create page layout
   const container = $('.container').css('max-width', '180vh');
@@ -105,8 +130,8 @@ const convertPVToAlgebraic = (pv, startingFen) => {
     'display': 'flex',
     'flex-direction': 'column',
     'gap': '15px',
-    'min-width': '0',
-    'max-width': 'none'
+    'min-width': '300px',
+    'max-width': '400px'
   });
 
   // Move existing container children to mainContent
@@ -221,26 +246,27 @@ const convertPVToAlgebraic = (pv, startingFen) => {
     type: 'line',
     data: {
       labels: [],
-      datasets: [{
-        label: 'White',
-        data: [],
-        borderColor: 'rgb(220, 220, 220)'
-      },
-      {
-        label: 'Black',
-        data: [],
-        borderColor: 'rgb(100, 100, 100)'
-      },
-      {
-        label: 'Kibitzer 1',
-        data: [],
-        borderColor: 'rgb(220, 100, 100)'
-      },
-      {
-        label: 'Kibitzer 2',
-        data: [],
-        borderColor: 'rgb(100, 100, 220)'
-      }
+      datasets: [
+        {
+          label: 'White',
+          data: [],
+          borderColor: 'rgb(220, 220, 220)'
+        },
+        {
+          label: 'Black',
+          data: [],
+          borderColor: 'rgb(100, 100, 100)'
+        },
+        {
+          label: 'Kibitzer 1',
+          data: [],
+          borderColor: 'rgb(220, 100, 100)'
+        },
+        {
+          label: 'Kibitzer 2',
+          data: [],
+          borderColor: 'rgb(100, 100, 220)'
+        }
       ]
     },
     options: {
@@ -250,9 +276,21 @@ const convertPVToAlgebraic = (pv, startingFen) => {
         y: {
           beginAtZero: true
         }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const pt = context.raw;
+              // If pt is an object and has tooltip, return that. Otherwise, use the y value.
+              return pt.tooltip || pt.y;
+            }
+          }
+        }
       }
     }
   });
+
 
   // State
   let currentFen = "";
@@ -311,25 +349,24 @@ const convertPVToAlgebraic = (pv, startingFen) => {
         const engineInfos = JSON.parse(response.responseText).engineInfos;
         engineInfos.forEach((info, index) => {
           const kibitzerNum = index + 1;
-          const score = info.score / 100;
-          $(`#kibitzer${kibitzerNum}-score`).text(score.toFixed(2));
+          $(`#kibitzer${kibitzerNum}-score`).text(parseScore(info.score).tooltip);
           $(`#kibitzer${kibitzerNum}-depth`).text(info.depth);
           $(`#kibitzer${kibitzerNum}-nodes`).text(formatCompactNumber(info.nodes));
           $(`#kibitzer${kibitzerNum}-nps`).text(formatCompactNumber(info.nps));
 
           // Update kibitzer scores for the chart (positions 2 and 3 in the scores array)
           const datasetIndex = 2 + index;
-          scores[datasetIndex][plyStr] = score;
+          scores[datasetIndex][plyStr] = { x: plyStr, y: parseScore(info.score).value, tooltip: parseScore(info.score).tooltip };
+
 
           let multipvHtml = "";
           if (info.multipv) {
-            info.multipv.sort((a, b) => isWhiteToMove(currentFen) ? -a.score + b.score : a.score - b.score).forEach((variation) => {
-              const scoreNum = (parseInt(variation.score) / 100).toFixed(2);
+            info.multipv.sort((a, b) => a.orderKey - b.orderKey).forEach((variation) => {
               const algebraicPV = convertPVToAlgebraic(variation.pv, currentFen);
               multipvHtml += `
                 <div class="multipv-box" style="border: 1px solid #ccc; margin-bottom: 5px; padding: 5px;">
                   <div class="multipv-header" style="font-weight: bold;color: #aaa;">
-                    Depth: ${variation.depth} | Eval: ${scoreNum}
+                    Depth: ${variation.depth} | Eval: ${variation.score} | OrderKey: ${variation.orderKey}
                   </div>
                   <div class="multipv-pv" style="margin-top: 3px;">${algebraicPV}</div>
                 </div>`;
@@ -348,15 +385,18 @@ const convertPVToAlgebraic = (pv, startingFen) => {
     const blackScore = parseFloat(blackScoreText);
 
     if (!isNaN(whiteScore)) {
-      scores[0][plyStr] = whiteScore;
+      scores[0][plyStr] = { x: plyStr, y: whiteScore, tooltip: whiteScore.toString() };
     }
     if (!isNaN(blackScore)) {
-      scores[1][plyStr] = blackScore;
+      scores[1][plyStr] = { x: plyStr, y: blackScore, tooltip: blackScore.toString() };
     }
 
     // Update chart datasets
     chart.data.datasets.forEach((dataset, i) => {
-      dataset.data = labels.map(plyStr => scores[i][plyStr] ?? null);
+      dataset.data = labels.map(plyStr => {
+        const scoreObj = scores[i][plyStr];
+        return scoreObj ? scoreObj : { x: plyStr, y: null };
+      });
     });
     chart.update();
   }, 1000);
