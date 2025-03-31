@@ -130,8 +130,6 @@
     'display': 'flex',
     'flex-direction': 'column',
     'gap': '15px',
-    'min-width': '300px',
-    'max-width': '400px'
   });
 
   // Move existing container children to mainContent
