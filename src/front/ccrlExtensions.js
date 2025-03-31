@@ -129,7 +129,9 @@
     'flex': '3',
     'display': 'flex',
     'flex-direction': 'column',
-    'gap': '15px',
+    'gap': '15px', 
+    'min-width': '0',
+    'max-width': 'none'
   });
 
   // Move existing container children to mainContent
