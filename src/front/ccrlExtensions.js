@@ -86,19 +86,19 @@
       const mateMoves = parseInt(scoreText.substring(2));
 
       // Use a high constant (e.g. 1000) so that mate scores are always above normal evals.
-      const value = 1000 - (isNaN(mateMoves) ? 0 : mateMoves);
+      const value = 50 - (isNaN(mateMoves) ? 0 : mateMoves * 0.01);
       return { value: value, tooltip: scoreText };
     }
     // Format: "-MX" where X is a positive integer (mate for black)
     else if (scoreText.startsWith("-M")) {
       const mateMoves = parseInt(scoreText.substring(2));
       // Use a low constant so that mate scores are always below normal evals.
-      const value = -1000 + (isNaN(mateMoves) ? 0 : mateMoves);
+      const value = -50 + (isNaN(mateMoves) ? 0 : mateMoves * 0.01);
       return { value: value, tooltip: scoreText };
     }
     else {
       const numStr = scoreText;
-      const value = parseFloat(numStr);
+      const value = parseFloat(numStr).clamp(-20,20);
       if (!isNaN(value)) {
         return { value: value, tooltip: scoreText };
       }
