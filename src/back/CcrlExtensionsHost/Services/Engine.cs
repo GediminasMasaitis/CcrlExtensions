@@ -156,7 +156,7 @@ public partial class Engine
             }
             else
             {
-                score = $"M{mateMoves}";
+                score = $"+M{mateMoves}";
             }
             orderKey = -(10000000 - mateMoves) * Math.Sign(mateMoves);
         }
