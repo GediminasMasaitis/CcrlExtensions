@@ -118,10 +118,20 @@ public partial class Engine
 
     private bool TryUpdateEngineInfo(string? line)
     {
-        if (string.IsNullOrEmpty(line) || !line.Contains("info") || _stringsToIgnore.Any(line.Contains))
+        if (string.IsNullOrEmpty(line) || _stringsToIgnore.Any(line.Contains))
             return false;
 
         CurrentEngineInfo ??= new EngineInfo();
+
+        if (!line.Contains("info"))
+        {
+            if (line.Contains("uciok"))
+            {
+                CurrentEngineInfo.Name = Config?.Name;
+                return true;
+            }
+            return false;
+        }
 
         int multipvNumber = 1;
         int depth = 0, cp = 0;
