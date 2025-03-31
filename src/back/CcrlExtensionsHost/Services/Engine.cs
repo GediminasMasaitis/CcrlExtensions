@@ -180,11 +180,11 @@ public partial class Engine
             existing.Depth = depth;
             existing.Score = score;
             existing.Pv = pv;
-            existing.orderKey = orderKey;
+            existing.OrderKey = orderKey;
         }
         else
         {
-            CurrentEngineInfo.Multipv.Add(new MultipvInfo { Multipv = multipvNumber, Depth = depth, Score = score, Pv = pv, orderKey = orderKey });
+            CurrentEngineInfo.Multipv.Add(new MultipvInfo { Multipv = multipvNumber, Depth = depth, Score = score, Pv = pv, OrderKey = orderKey });
         }
 
         if (multipvNumber == 1)

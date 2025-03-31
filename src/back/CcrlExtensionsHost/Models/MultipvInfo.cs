@@ -7,5 +7,5 @@ public class MultipvInfo
     public string? Mate { get; set; }
     public int Depth { get; set; }
     public string? Pv { get; set; }
-    public int? orderKey { get; set; }
+    public int? OrderKey { get; set; }
 }
