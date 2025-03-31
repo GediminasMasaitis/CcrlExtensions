@@ -366,7 +366,7 @@
               multipvHtml += `
                 <div class="multipv-box" style="border: 1px solid #ccc; margin-bottom: 5px; padding: 5px;">
                   <div class="multipv-header" style="font-weight: bold;color: #aaa;">
-                    Depth: ${variation.depth} | Eval: ${variation.score} | OrderKey: ${variation.orderKey}
+                    Depth: ${variation.depth} | Eval: ${variation.score}
                   </div>
                   <div class="multipv-pv" style="margin-top: 3px;">${algebraicPV}</div>
                 </div>`;
