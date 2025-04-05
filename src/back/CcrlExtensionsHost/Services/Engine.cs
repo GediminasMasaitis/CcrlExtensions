@@ -149,6 +149,7 @@ public partial class Engine
         var mateMatch = _mateRegex.Match(line);
         if (mateMatch.Success && int.TryParse(mateMatch.Groups[1].Value, out var mateMoves))
         {
+            orderKey = -(10000000 - mateMoves) * Math.Sign(mateMoves);
             if (_currentFen?.Contains(" b ") == true) mateMoves = -mateMoves;
             if (mateMoves < 0)
             {
@@ -158,7 +159,6 @@ public partial class Engine
             {
                 score = $"+M{mateMoves}";
             }
-            orderKey = -(10000000 - mateMoves) * Math.Sign(mateMoves);
         }
         else
         {
