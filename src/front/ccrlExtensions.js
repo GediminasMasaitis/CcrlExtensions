@@ -97,7 +97,7 @@
     }
     else {
       const numStr = scoreText;
-      const value = parseFloat(numStr).clamp(-20,20);
+      const value = Math.min(Math.max(parseFloat(numStr), -20), 20);
       if (!isNaN(value)) {
         return { value: value, tooltip: scoreText };
       }
