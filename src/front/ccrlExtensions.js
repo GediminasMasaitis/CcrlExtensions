@@ -80,7 +80,6 @@
   // A helper function to parse the score string into a numeric value and display string
   const parseScore = (scoreText) => {
     scoreText = scoreText.trim();
-    console.log(scoreText)
     // Format: "+MX" where X is a positive integer (mate for white)
     if (scoreText.startsWith("+M")) {
       const mateMoves = parseInt(scoreText.substring(2));
