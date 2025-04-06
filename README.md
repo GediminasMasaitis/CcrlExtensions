@@ -7,9 +7,9 @@ The extensions consist of 2 parts:
 
 Only one CCRL live viewer tab can be open at a time in the browser for these extensions to work.
 
-This is what it looks like to watch a game with two engines (StockFish 13 and StockFish 16.1) as kibitzers:
+This is what it looks like to watch a game with one engine (StockFish 17) as kibitzer with MultiPV set to 3:
 
-![Screenshot of the extension in action, with StockFish 13 and StockFish 16.1 acting as kibitzers in a game](https://github.com/GediminasMasaitis/CcrlExtensions/assets/11148519/0693ee16-3240-493f-98cd-8d9daa814749)
+![Screenshot of the extension in action, with StockFish 17 acting as kibitzer in a game with MultiPv set to 3](https://github.com/user-attachments/assets/cb9bab38-8852-49a6-903c-8c3d76081c34)
 
 ## How to setup
 
