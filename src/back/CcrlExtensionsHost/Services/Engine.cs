@@ -85,7 +85,7 @@ public partial class Engine
     {
         _logger.LogDebug("{EngineName} >> {EngineOutput}", Config?.Name, line);
 
-        var success = TryUpdateEngineInfo(line);
+        _ = TryUpdateEngineInfo(line);
     }
 
     [GeneratedRegex(" multipv (\\d+)", RegexOptions.Compiled)]
@@ -173,16 +173,28 @@ public partial class Engine
         }
 
         var depthMatch = _depthRegex.Match(line);
-        if (depthMatch.Success) int.TryParse(depthMatch.Groups[1].Value, out depth);
+        if (depthMatch.Success && int.TryParse(depthMatch.Groups[1].Value, out var depthParsed))
+        {
+            depth = depthParsed;
+        }
 
         var nodesMatch = _nodesRegex.Match(line);
-        if (nodesMatch.Success) long.TryParse(nodesMatch.Groups[1].Value, out nodes);
+        if (nodesMatch.Success && long.TryParse(nodesMatch.Groups[1].Value, out var nodesParsed))
+        {
+            nodes = nodesParsed;
+        }
 
         var npsMatch = _npsRegex.Match(line);
-        if (npsMatch.Success) long.TryParse(npsMatch.Groups[1].Value, out nps);
+        if (npsMatch.Success && long.TryParse(npsMatch.Groups[1].Value, out var npsParsed))
+        {
+            nps = npsParsed;
+        }
 
         var pvMatch = _pvRegex.Match(line);
-        if (pvMatch.Success) pv = pvMatch.Groups[1].Value;
+        if (pvMatch.Success)
+        {
+            pv = pvMatch.Groups[1].Value;
+        }
 
         var existing = CurrentEngineInfo.Multipv.FirstOrDefault(m => m.Multipv == multipvNumber);
         if (existing != null)
@@ -207,7 +219,6 @@ public partial class Engine
         CurrentEngineInfo.Nps = nps;
         CurrentEngineInfo.Nodes = nodes;
         CurrentEngineInfo.Name = Config?.Name;
-
 
         return true;
     }
