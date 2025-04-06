@@ -8,4 +8,7 @@ public class EngineInfo
     public long Nodes { get; set; }
     public long Nps { get; set; }
     public string? Pv { get; set; }
+
+    // Multipv
+    public List<MultipvInfo> Multipv { get; set; } = [];
 }

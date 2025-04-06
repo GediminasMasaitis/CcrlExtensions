@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using CcrlExtensionsHost.Configs;
 using CcrlExtensionsHost.Models;
@@ -10,6 +11,13 @@ public partial class Engine
     private const int GracefulShutdownTime = 3_000;
 
     private readonly ILogger<Engine> _logger;
+
+    private static readonly string[] _stringsToIgnore =
+    [
+        "lowerbound",
+        "upperbound",
+        "currmove"
+    ];
     private Process? _process;
     private string? _currentFen;
 
@@ -77,16 +85,20 @@ public partial class Engine
     {
         _logger.LogDebug("{EngineName} >> {EngineOutput}", Config?.Name, line);
 
-        var success = TryGetEngineInfo(line, out var info);
-        if (success)
-        {
-            CurrentEngineInfo = info;
-        }
+        _ = TryUpdateEngineInfo(line);
     }
+
+    [GeneratedRegex(" multipv (\\d+)", RegexOptions.Compiled)]
+    private static partial Regex MultipvRegex();
+    private readonly Regex _multipvRegex = MultipvRegex();
 
     [GeneratedRegex(" score cp (-?\\d+)", RegexOptions.Compiled)]
     private static partial Regex CpRegex();
     private readonly Regex _cpRegex = CpRegex();
+
+    [GeneratedRegex(" score mate (-?\\d+)", RegexOptions.Compiled)]
+    private static partial Regex MateRegex();
+    private readonly Regex _mateRegex = MateRegex();
 
     [GeneratedRegex(" depth (\\d+)", RegexOptions.Compiled)]
     private static partial Regex DepthRegex();
@@ -104,88 +116,109 @@ public partial class Engine
     private static partial Regex PvRegex();
     private readonly Regex _pvRegex = PvRegex();
 
-    private bool TryGetEngineInfo(string? line, out EngineInfo info)
+    private bool TryUpdateEngineInfo(string? line)
     {
-        info = new EngineInfo();
-        if (string.IsNullOrEmpty(line))
-        {
+        if (string.IsNullOrEmpty(line) || _stringsToIgnore.Any(line.Contains))
             return false;
-        }
+
+        CurrentEngineInfo ??= new EngineInfo();
 
         if (!line.Contains("info"))
         {
             if (line.Contains("uciok"))
             {
-                info.Name = Config?.Name;
-
+                CurrentEngineInfo.Name = Config?.Name;
                 return true;
             }
-
             return false;
         }
 
-        if (line.Contains("lowerbound"))
+        int multipvNumber = 1;
+        int depth = 0, cp = 0;
+        long nodes = 0, nps = 0;
+        string score = "0", pv = "";
+        int orderKey = 0;
+
+        // Default multipv number is 1
+        var multipvMatch = _multipvRegex.Match(line);
+        if (multipvMatch.Success && int.TryParse(multipvMatch.Groups[1].Value, out var multiPvNumberParsed))
         {
-            return false;
+            multipvNumber = multiPvNumberParsed;
         }
 
-        if (line.Contains("upperbound"))
+        var mateMatch = _mateRegex.Match(line);
+        if (mateMatch.Success && int.TryParse(mateMatch.Groups[1].Value, out var mateMoves))
         {
-            return false;
-        }
-
-        if (line.Contains("currmove"))
-        {
-            return false;
-        }
-
-        info.Name = Config?.Name;
-
-        var cpMatch = _cpRegex.Match(line);
-        if (cpMatch.Success)
-        {
-            if (int.TryParse(cpMatch.Groups[1].Value, out var cp))
+            orderKey = -(10000000 - mateMoves) * Math.Sign(mateMoves);
+            if (_currentFen?.Contains(" b ") == true) mateMoves = -mateMoves;
+            if (mateMoves < 0)
             {
-                if (_currentFen?.Contains(" b ") == true)
-                {
-                    cp = -cp;
-                }
-                info.Score = cp.ToString();
+                score = $"-M{-mateMoves}";
+            }
+            else
+            {
+                score = $"+M{mateMoves}";
+            }
+        }
+        else
+        {
+            var cpMatch = _cpRegex.Match(line);
+            if (cpMatch.Success && int.TryParse(cpMatch.Groups[1].Value, out var cpParsed))
+            {
+                cp = cpParsed;
+                orderKey = -cp;
+                if (_currentFen?.Contains(" b ") == true) cp = -cp;
+                score = $"{((float)cp / 100).ToString(CultureInfo.InvariantCulture)}";
             }
         }
 
         var depthMatch = _depthRegex.Match(line);
-        if (depthMatch.Success)
+        if (depthMatch.Success && int.TryParse(depthMatch.Groups[1].Value, out var depthParsed))
         {
-            if (int.TryParse(depthMatch.Groups[1].Value, out var depth))
-            {
-                info.Depth = depth;
-            }
+            depth = depthParsed;
         }
 
         var nodesMatch = _nodesRegex.Match(line);
-        if (nodesMatch.Success)
+        if (nodesMatch.Success && long.TryParse(nodesMatch.Groups[1].Value, out var nodesParsed))
         {
-            if (long.TryParse(nodesMatch.Groups[1].Value, out var nodes))
-            {
-                info.Nodes = nodes;
-            }
+            nodes = nodesParsed;
         }
 
         var npsMatch = _npsRegex.Match(line);
-        if (npsMatch.Success)
+        if (npsMatch.Success && long.TryParse(npsMatch.Groups[1].Value, out var npsParsed))
         {
-            if (long.TryParse(npsMatch.Groups[1].Value, out var nps))
-            {
-                info.Nps = nps;
-            }
+            nps = npsParsed;
         }
 
         var pvMatch = _pvRegex.Match(line);
         if (pvMatch.Success)
         {
-            info.Pv = pvMatch.Groups[1].Value;
+            pv = pvMatch.Groups[1].Value;
         }
+
+        var existing = CurrentEngineInfo.Multipv.FirstOrDefault(m => m.Multipv == multipvNumber);
+        if (existing != null)
+        {
+            existing.Depth = depth;
+            existing.Score = score;
+            existing.Pv = pv;
+            existing.OrderKey = orderKey;
+        }
+        else
+        {
+            CurrentEngineInfo.Multipv.Add(new MultipvInfo { Multipv = multipvNumber, Depth = depth, Score = score, Pv = pv, OrderKey = orderKey });
+        }
+
+        if (multipvNumber == 1)
+        {
+            CurrentEngineInfo.Score = score;
+            CurrentEngineInfo.Depth = depth;
+            CurrentEngineInfo.Pv = pv;
+        }
+
+        CurrentEngineInfo.Nps = nps;
+        CurrentEngineInfo.Nodes = nodes;
+        CurrentEngineInfo.Name = Config?.Name;
 
         return true;
     }
@@ -213,6 +246,8 @@ public partial class Engine
                 await SendAsync("ucinewgame");
             }
             await SendAsync($"position fen {fen}");
+            // Reset the EngineInfo struct
+            CurrentEngineInfo?.Multipv.Clear();
             await SendAsync("go infinite");
         }
     }
