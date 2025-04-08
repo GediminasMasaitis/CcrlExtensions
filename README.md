@@ -19,7 +19,7 @@ Alternatively, you can always build the backend yourself (.NET 8.0 required) and
 
 ### Front end
 
-1. Install a usercript runner. Only tested on Firefox and Violentmonkey plugin.
+1. Install a usercript runner. Only tested on both Firefox and Chrome with the userscript managers Violentmonkey and Tampermonkey.
 2. Copy [`ccrlExtensions.js`](src/front/ccrlExtensions.js) into a new userscript and save changes.
 
 ![Screenshot of Violentmonkey setup](https://github.com/GediminasMasaitis/CcrlExtensions/assets/11148519/13439011-eb74-4004-8ba9-1b5399e248b5)
