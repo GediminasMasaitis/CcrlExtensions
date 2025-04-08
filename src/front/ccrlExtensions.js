@@ -322,7 +322,21 @@
       }
     });
   };
-  $('#fen').on('DOMSubtreeModified', sendFen);
+
+  // Register a MutationObserver to look at fen changes
+  const fenElement = document.getElementById('fen');
+  if (fenElement) {
+    const observer = new MutationObserver((mutationsList) => {
+      // Send the new fen to the backend
+      sendFen();
+    });
+    // Observe the fen textbox
+    observer.observe(fenElement, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
 
   // Update the graph and kibitzers every second
   setInterval(() => {
