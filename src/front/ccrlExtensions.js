@@ -367,10 +367,10 @@
           $(`#kibitzer${kibitzerNum}-nodes`).text(formatCompactNumber(info.nodes));
           $(`#kibitzer${kibitzerNum}-nps`).text(formatCompactNumber(info.nps));
 
-          // Update kibitzer scores for the chart (positions 2 and 3 in the scores array)
+          // Update kibitzer scores and labels for the chart (positions 2 and 3 in the scores array)
           const datasetIndex = 2 + index;
           scores[datasetIndex][plyStr] = { x: plyStr, y: parseScore(info.score).value, tooltip: parseScore(info.score).tooltip };
-
+          chart.data.datasets[datasetIndex].label = info.name;
 
           let multipvHtml = "";
           if (info.multipv) {
